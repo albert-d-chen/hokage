@@ -1,0 +1,6 @@
+#game-canvas{
+    position: absolute;
+    left: 25%;
+    top: 20%;
+    border: 3px solid black;
+}
