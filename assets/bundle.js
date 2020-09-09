@@ -94,48 +94,54 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 const Player = __webpack_require__(/*! ./player */ "./lib/player.js");
+const Obstacle = __webpack_require__(/*! ./obstacle */ "./lib/obstacle.js");
 
 class Game {
-  constructor(ctx, gameCanvas) {
-    this.ctx = ctx;
-    this.gameCanvas = gameCanvas;
+    constructor(ctx, gameCanvas) {
+        this.ctx = ctx;
+        this.gameCanvas = gameCanvas;
 
-    this.player = new Player();
+        this.player = new Player();
+        this.obstacle = new Obstacle();
 
-    this.registerEvents();
-  }
-
-  play() {
-    console.log("play");
-    this.running = true;
-    this.animate();
-  }
-
-  start() {
-    this.player.draw(this.ctx);
-    //   requestAnimationFrame(this.update);
-  }
-
-  registerEvents() {
-    this.boundClickHandler = this.click.bind(this);
-    this.gameCanvas.addEventListener("mousedown", this.boundClickHandler);
-    document.addEventListener('keydown', () => {
-        this.player.jumping = true;
-    })
-  }
-  
-  animate() {
-    this.player.animate(this.ctx);
-    if (this.running) {
-      requestAnimationFrame(this.animate.bind(this));
+        this.registerEvents();
     }
-  }
 
-  click(e) {
-    if (!this.running) {
-      this.play();
+    play() {
+        console.log("play");
+        this.running = true;
+        this.animate();
     }
-  }
+
+    start() {
+        this.player.draw(this.ctx);
+        //   requestAnimationFrame(this.update);
+    }
+
+    registerEvents() {
+        this.boundClickHandler = this.click.bind(this);
+        this.gameCanvas.addEventListener("mousedown", this.boundClickHandler);
+        document.addEventListener('keydown', (event) => {
+            if (event.code === 'Space'){
+                this.player.jumping = true;
+            } 
+        })
+
+    }
+    
+    animate() {
+        this.obstacle.animate(this.ctx);
+        this.player.animate(this.ctx);
+        if (this.running) {
+        requestAnimationFrame(this.animate.bind(this));
+        }
+    }
+
+    click(e) {
+        if (!this.running) {
+        this.play();
+        }
+    }
 
 }
 
@@ -171,6 +177,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
 /***/ }),
 
+/***/ "./lib/obstacle.js":
+/*!*************************!*\
+  !*** ./lib/obstacle.js ***!
+  \*************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+const CONSTANTS = {
+    OBSTACLE_WIDTH: 50,
+    SPACING: 300,
+    SPEED: 2,
+}
+
+class Obstacle {
+    constructor(options) {
+        this.x = 300;
+        this.y = 270;
+    }
+
+    drawObstacle(ctx) {
+        ctx.beginPath();
+        ctx.fillStyle = "orange";
+        ctx.fillRect(this.x, this.y, 50, 130)
+        ctx.closePath();
+    }
+ 
+    animate(ctx) {
+        this.drawObstacle(ctx);
+    }
+
+}
+
+module.exports = Obstacle;
+
+/***/ }),
+
 /***/ "./lib/player.js":
 /*!***********************!*\
   !*** ./lib/player.js ***!
@@ -186,13 +228,13 @@ class Player {
     this.y = 350;
     this.jumping = false;
     this.jumpCount = 0;
+    this.jumpTimer = 0;
   }
 
   draw(ctx) {
-    console.log(this.y);
     ctx.beginPath();
     ctx.fillStyle = "cyan";
-    ctx.fillRect(this.x, this.y, 50, 50);
+    ctx.fillRect(this.x, this.y, 50, 50 );
     ctx.closePath();
   }
 
@@ -202,7 +244,7 @@ class Player {
     //       this.y = 350;
     //     } else {
     //         this.y -= 30;
-
+ 
     //   }
 
     const gravity = 0.4;
