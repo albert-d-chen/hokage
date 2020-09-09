@@ -95,6 +95,7 @@
 
 const Player = __webpack_require__(/*! ./player */ "./lib/player.js");
 const Obstacle = __webpack_require__(/*! ./obstacle */ "./lib/obstacle.js");
+const Score = __webpack_require__(/*! ./score */ "./lib/score.js");
 
 class Game {
     constructor(ctx, gameCanvas) {
@@ -104,21 +105,17 @@ class Game {
         this.player = new Player();
         this.obstacle = new Obstacle();
 
-        this.obstacles = [];
+        this.score = new Score();
 
-        
         this.registerEvents();
+        // this.restartGame();
+        // this.restartGame = this.restartGame.bind(this);
     }
 
     play() {
         console.log("play");
         this.running = true;
         this.animate();
-    }
-
-    start() {
-        this.player.draw(this.ctx);
-        //   requestAnimationFrame(this.update);
     }
 
     registerEvents() {
@@ -129,22 +126,60 @@ class Game {
                 this.player.jumping = true;
             } 
         })
+        this.gameCanvas.addEventListener('keydown', this.restartGame(event))
 
     }
     
     click(e) {
         if (!this.running) {
+        // this.score.score = 0;
         this.play();
         }
+    }
+    
+    gameOver() {
+        return (
+            this.obstacle.checkCollision(this.player.playerHitBox())
+        )
+    }
+
+    restartGame() {
+            this.running = false;
+            this.score = new Score();
+            this.player = new Player();
+            this.obstacle = new Obstacle();
+            this.animate();
+    }
+
+    gameOverMenu() {
+        const gameover = 'GAME OVER';
+        const tryagain = 'Press L to accept defeat and try again';
+        this.ctx.font = '50px Helvetica';
+        this.ctx.strokeStyle = 'cyan';
+        this.ctx.fillStyle = 'white';
+        this.ctx.strokeText(gameover, 250, 150);
+        this.ctx.fillText(gameover, 250, 150);
+        this.ctx.font = '30px Helvetica';
+        this.ctx.strokeText(tryagain, 130, 180);
+        this.ctx.fillText(tryagain, 130, 180);
     }
 
     animate() {
         this.obstacle.animate(this.ctx);
         this.player.animate(this.ctx);
+
+        if (this.gameOver()) {
+            this.gameOverMenu();
+            this.restartGame();
+        }
+
+        this.score.draw(this.ctx);
+
         if (this.running) {
             requestAnimationFrame(this.animate.bind(this));
         }
     }
+
 
 }
 
@@ -207,6 +242,8 @@ class Obstacle {
             oneObstacle: {  
                 left: x,
                 right: CONSTANTS.OBSTACLE_WIDTH + x,
+                top: this.y,
+                bottom: this.y + 130
             },
             passed: false
         }
@@ -249,6 +286,27 @@ class Obstacle {
         this.drawBackground(ctx);
         this.move(ctx);
         this.drawObstacle(ctx);
+    }
+
+    checkCollision(player) {
+        const _collision = (obstacleBox, playerBox) => {
+            if (obstacleBox.left > playerBox.right || obstacleBox.right < playerBox.left) {
+                return false;
+            }
+            if (obstacleBox.top > playerBox.bottom || obstacleBox.bottom < playerBox.top) {
+                return false;
+            }
+            
+            return true;
+        };
+
+        let hit = false;
+        this.eachObstacle((obstacle) => {
+            if (_collision(obstacle.oneObstacle, player)) {
+                hit = true;
+            }
+        });
+        return hit;
     }
 
 }
@@ -308,10 +366,52 @@ class Player {
     this.jump(ctx);
     this.draw(ctx);
   }
+
+  playerHitBox() {
+      return {
+          left: this.x,
+          right: this.x + 50,
+          top: this.y,
+          bottom: this.y + 50,
+      }
+  }
 }
 
 module.exports = Player;
 
+
+/***/ }),
+
+/***/ "./lib/score.js":
+/*!**********************!*\
+  !*** ./lib/score.js ***!
+  \**********************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+class Score { 
+    constructor() {
+        this.score = 0;
+    }
+
+    draw(ctx) {
+        const yourScore = `Score: ${this.score}`;
+        ctx.font = "25px Helvetica";
+        ctx.strokeStyle = "cyan";
+        ctx.lineWidth = 2;
+        ctx.fillStyle = "white";
+        ctx.textAlign = "left";
+        ctx.strokeText(yourScore, 10, 40);
+        ctx.fillText(yourScore, 10, 40);
+        this.increaseScore();
+    }
+
+    increaseScore() {
+        this.score += 1;
+    }
+}
+
+module.exports = Score;
 
 /***/ })
 
