@@ -104,6 +104,9 @@ class Game {
         this.player = new Player();
         this.obstacle = new Obstacle();
 
+        this.obstacles = [];
+
+        
         this.registerEvents();
     }
 
@@ -129,17 +132,17 @@ class Game {
 
     }
     
+    click(e) {
+        if (!this.running) {
+        this.play();
+        }
+    }
+
     animate() {
         this.obstacle.animate(this.ctx);
         this.player.animate(this.ctx);
         if (this.running) {
-        requestAnimationFrame(this.animate.bind(this));
-        }
-    }
-
-    click(e) {
-        if (!this.running) {
-        this.play();
+            requestAnimationFrame(this.animate.bind(this));
         }
     }
 
@@ -168,9 +171,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // gameCanvas.width = 700;
     // gameCanvas.height = 400;
 
-    const game = new Game(ctx, gameCanvas);
+    new Game(ctx, gameCanvas);
 
-    game.play();
+    // game.play();
 
 });
 
@@ -185,25 +188,66 @@ document.addEventListener("DOMContentLoaded", function () {
 /***/ (function(module, exports) {
 
 const CONSTANTS = {
-    OBSTACLE_WIDTH: 50,
-    SPACING: 300,
-    SPEED: 2,
+    OBSTACLE_WIDTH: 30,
+    SPACING: 500,
 }
 
 class Obstacle {
     constructor(options) {
         this.x = 300;
         this.y = 270;
+        this.speed = 5;
+        const firstObstacleDistance = this.x + 200;
+
+        this.obstacles = [this.createObstacle(firstObstacleDistance + 200), this.createObstacle(firstObstacleDistance * 3  )];
+    }
+
+    createObstacle(x) {
+        const obstacle = {
+            oneObstacle: {  
+                left: x,
+                right: CONSTANTS.OBSTACLE_WIDTH + x,
+            },
+            passed: false
+        }
+        return obstacle;
+    }
+
+    eachObstacle(callback){
+        this.obstacles.forEach(callback.bind(this))
     }
 
     drawObstacle(ctx) {
-        ctx.beginPath();
-        ctx.fillStyle = "orange";
-        ctx.fillRect(this.x, this.y, 50, 130)
-        ctx.closePath();
+        this.eachObstacle(function(obstacle) {
+            ctx.beginPath();
+            ctx.fillStyle = "orange";
+            ctx.fillRect(obstacle.oneObstacle.left  , this.y, 30, 130);
+            ctx.closePath();
+        })
     }
- 
-    animate(ctx) {
+
+    move(ctx) {
+        this.eachObstacle(function(obstacle) {
+            obstacle.oneObstacle.left -= this.speed;
+        })
+
+        if (this.obstacles[0].oneObstacle.left <= 0) {
+            this.obstacles.shift();
+            const newObstacle = this.obstacles[0].oneObstacle.left + CONSTANTS.SPACING;
+            this.obstacles.push(this.createObstacle(newObstacle))
+        }
+        // this.x -= this.speed;
+        // ctx.clearRect(25, 350, 400, 70  0);
+    }
+
+    drawBackground(ctx) {
+        ctx.fillStyle = "black ";
+        ctx.fillRect(0, 0, 800, 700);
+    }
+
+    animate(ctx) { 
+        this.drawBackground(ctx);
+        this.move(ctx);
         this.drawObstacle(ctx);
     }
 
@@ -234,35 +278,22 @@ class Player {
   draw(ctx) {
     ctx.beginPath();
     ctx.fillStyle = "cyan";
-    ctx.fillRect(this.x, this.y, 50, 50 );
+    ctx.fillRect(this.x, this.y, 50, 50);
     ctx.closePath();
   }
 
   jump(ctx) {
-    //   ctx.clearRect(this.x, this.y, 400, 750);
-    //   if (this.y < 200) {
-    //       this.y = 350;
-    //     } else {
-    //         this.y -= 30;
- 
-    //   }
-
     const gravity = 0.4;
     const initialSpeed = 12;
 
-    // if (this.jumpCount > 50) {
-    //     this.jumping = false;
-    // } else {
-    //     this.jumping = true;
-    // }
     if (this.jumping) {
-        ctx.clearRect(this.x, this.y, 60, 60);
-        if (this.jumpCount === 0 || !this.grounded()) {
-            this.y -= initialSpeed - gravity * this.jumpCount;
-            this.jumpCount += 1;
-        }
-    } 
-    if (this.jumpCount > 60){
+      ctx.clearRect(this.x, this.y, 40, 0);
+      if (this.jumpCount === 0 || !this.grounded()) {
+        this.y -= initialSpeed - gravity * this.jumpCount;
+        this.jumpCount += 1;
+      }
+    }
+    if (this.jumpCount > 60) {
       this.y = 350;
       this.jumpCount = 0;
       this.jumping = false;
@@ -277,7 +308,6 @@ class Player {
     this.jump(ctx);
     this.draw(ctx);
   }
-
 }
 
 module.exports = Player;
