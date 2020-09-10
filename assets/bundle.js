@@ -107,8 +107,9 @@ class Game {
 
     this.score = new Score();
 
-    this.count = 1000;
+    this.playerDown = false;
 
+    this.count = 1000;
     this.registerEvents();
     this.gameStartMenu = this.gameStartMenu.bind(this);
     // this.restartGame();
@@ -160,11 +161,11 @@ class Game {
     this.ctx.font = "50px Naruto";
     this.ctx.strokeStyle = "red";
     this.ctx.fillStyle = "red";
-    this.ctx.strokeText(gameover, 250, 150);
-    this.ctx.fillText(gameover, 250, 150);
+    this.ctx.strokeText(gameover, 230, 150);
+    this.ctx.fillText(gameover, 230, 150);
     this.ctx.font = "30px Naruto";
-    this.ctx.strokeText(tryagain, 80, 200);
-    this.ctx.fillText(tryagain, 80, 200);
+    this.ctx.strokeText(tryagain, 60, 200);
+    this.ctx.fillText(tryagain, 60, 200);
   }
 
   gameStartMenu() {
@@ -174,8 +175,8 @@ class Game {
       this.ctx.font = "50px Naruto";
       this.ctx.strokeStyle = "white";
       this.ctx.fillStyle = "white";
-      this.ctx.strokeText(gameover, 190, 200);
-      this.ctx.fillText(gameover, 190, 200);
+      this.ctx.strokeText(gameover, 180, 200);
+      this.ctx.fillText(gameover, 180, 200);
     // } else {
     //     this.ctx.fillStyle = 'black'
     //     this.ctx.fillRect(100, 100, 500, 200)
@@ -191,22 +192,24 @@ animate() {
     this.obstacle.animate(this.ctx);
     this.player.animate(this.ctx);
     
-    if (!this.running && !this.gameOver()) {
-        this.gameStartMenu();
+    if (!this.running) {
+        this.gameStartMenu(); 
         // this.gameStartMenu();
     }
     
     if (this.gameOver()) {
+      this.obstacle.animate(this.ctx);
+      this.player.drawGameOverSprite(this.ctx);
       this.gameOverMenu();
       this.running = false;
     }
 
     this.score.draw(this.ctx);
 
-    if (this.running) {
+    if (this.running) {  
       requestAnimationFrame(this.animate.bind(this));
     }
-  }
+  } 
 }
 
 module.exports = Game;
@@ -234,7 +237,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const game = new Game(ctx, gameCanvas);
 
-    game.animate();
+    game.play();
 
 });
 
@@ -256,11 +259,13 @@ const CONSTANTS = {
 class Obstacle {
     constructor(options) {
         this.x = 300;
-        this.y = 270;
+        this.y = 230;
         this.speed = 5;
         const firstObstacleDistance = this.x + 200;
 
-        this.obstacles = [this.createObstacle(firstObstacleDistance + 200), this.createObstacle(firstObstacleDistance * 3  )];
+        this.background = new Image();
+        this.background.src =  './assets/images/forest.png';
+        this.obstacles = [this.createObstacle(firstObstacleDistance + 210), this.createObstacle(firstObstacleDistance * 3  )];
     }
 
     createObstacle(x) {
@@ -303,9 +308,13 @@ class Obstacle {
         // ctx.clearRect(25, 350, 400, 70  0);
     }
 
+    // drawBackground(ctx) {
+    //     ctx.fillStyle = "black";
+    //     ctx.fillRect(0, 0, 800, 700);
+    // }
+
     drawBackground(ctx) {
-        ctx.fillStyle = "black ";
-        ctx.fillRect(0, 0, 800, 700);
+        ctx.drawImage(this.background, 0, -50);
     }
 
     animate(ctx) { 
@@ -348,59 +357,127 @@ module.exports = Obstacle;
 /*! no static exports found */
 /***/ (function(module, exports) {
 
+const NARUTO = {
+    run1: [20, 291 , 50, 50],
+    run2: [144, 291, 50, 50],
+    run3: [260, 291, 50, 50],
+    run4: [380, 291, 50, 50],
+    run5: [500, 291, 50, 50],
+    run6: [620, 291, 50, 50],
+    hit: [852, 182, 50, 50]
+
+}
 class Player {
   constructor(options) {
     // this.position = options.position;
     this.vel = 0;
     this.x = 25;
-    this.y = 350;
+    this.y = 300;
     this.jumping = false;
     this.jumpCount = 0;
     this.jumpTimer = 0;
+    this.runCycle = 0;
+
+    this.spriteSheet = new Image();
+    this.spriteSheet.src = './assets/images/narutosprite.png';
   }
 
-  draw(ctx) {
-    ctx.beginPath();
-    ctx.fillStyle = "cyan";
-    ctx.fillRect(this.x, this.y, 50, 50);
-    ctx.closePath();
-  }
+//   draw(ctx) {
+//     ctx.beginPath();
+//     ctx.fillStyle = "cyan";
+//     ctx.fillRect(this.x, this.y, 50, 50);
+//     ctx.closePath();
+//   }
 
-  jump(ctx) {
-    const gravity = 0.4;
-    const initialSpeed = 12;
-
-    if (this.jumping) {
-      ctx.clearRect(this.x, this.y, 40, 0);
-      if (this.jumpCount === 0 || !this.grounded()) {
-        this.y -= initialSpeed - gravity * this.jumpCount;
-        this.jumpCount += 1;
-      }
+    draw(ctx) {
+        const sprite = this.pickSprite();
+        ctx.drawImage(this.spriteSheet, sprite[0], sprite[1], sprite[2], sprite[3], this.x, this.y -20  , 70, 70)
     }
-    if (this.jumpCount > 60) {
-      this.y = 350;
-      this.jumpCount = 0;
-      this.jumping = false;
+
+
+    pickSprite() {
+        if (this.playerDown) {
+            return NARUTO.hit;
+        } else if (!this.grounded()) {
+            return NARUTO.run6;
+        } else if (this.runCycle < 10) {
+            this.runCycle += 1;
+            return NARUTO.run1;
+        } else if (this.runCycle < 20) {
+            this.runCycle += 1;
+            return NARUTO.run2;
+        } else if (this.runCycle < 30) {
+            this.runCycle += 1;
+            return NARUTO.run3;
+        } else if (this.runCycle < 40) {
+            this.runCycle += 1;
+            return NARUTO.run4;
+        } else if (this.runCycle < 50){
+            this.runCycle += 1;
+            return NARUTO.run5;
+        } else if (this.runCycle < 60){
+            this.runCycle += 1;
+            return NARUTO.run6;
+        } else if (this.runCycle < 70){
+            this.runCycle = 0;
+            return NARUTO.run1;
+        }
     }
-  }
 
-  grounded() {
-    return this.x === 25 && this.y >= 350;
-  }
+    jump(ctx) {
+        const gravity = 0.4;
+        const initialSpeed = 12;
 
-  animate(ctx) {
-    this.jump(ctx);
-    this.draw(ctx);
-  }
+        if (this.jumping) {
+        ctx.clearRect(this.x, this.y, 40, 0);
+        if (this.jumpCount === 0 || !this.grounded()) {
+            this.y -= initialSpeed - gravity * this.jumpCount;
+            this.jumpCount += 1;
+        }
+        }
+        if (this.jumpCount > 60) {
+        this.y = 300;
+        this.jumpCount = 0;
+        this.jumping = false;
+        }
+    }
 
-  playerHitBox() {
-      return {
-          left: this.x,
-          right: this.x + 50,
-          top: this.y,
-          bottom: this.y + 50,
-      }
-  }
+    grounded() {
+        return this.x === 25 && this.y >= 300;
+    }
+
+    animate(ctx) {
+        this.jump(ctx);
+        this.draw(ctx);
+    }
+
+    pickGameOverSprite(){
+        return NARUTO.hit;
+    }
+
+    drawGameOverSprite(ctx){
+        const sprite = this.pickGameOverSprite();
+        ctx.drawImage(
+          this.spriteSheet,
+          sprite[0],
+          sprite[1],
+          sprite[2],
+          sprite[3],
+          this.x,
+          this.y - 20,
+          70,
+          70
+        );
+    }
+
+    playerHitBox() {
+        return {
+            left: this.x,
+            right: this.x + 75,
+            top: this.y,
+            bottom: this.y + 50,
+        }
+    }
 }
 
 module.exports = Player;
