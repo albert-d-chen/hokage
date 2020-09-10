@@ -126,13 +126,12 @@ class Game {
                 this.player.jumping = true;
             } 
         })
-        this.gameCanvas.addEventListener('keydown', this.restartGame(event))
-
+        this.restart = this.restartGame.bind(this);
+        document.addEventListener('keydown', this.restart)
     }
     
     click(e) {
         if (!this.running) {
-        // this.score.score = 0;
         this.play();
         }
     }
@@ -143,12 +142,16 @@ class Game {
         )
     }
 
-    restartGame() {
-            this.running = false;
-            this.score = new Score();
-            this.player = new Player();
-            this.obstacle = new Obstacle();
-            this.animate();
+    restartGame(e) {
+            // debugger
+            if (e.key === 'l' && this.gameOver()) {
+                    this.score = new Score();
+                    this.player = new Player();
+                    this.obstacle = new Obstacle();
+                    e.preventDefault();
+                    this.animate();
+                }
+            
     }
 
     gameOverMenu() {
@@ -157,8 +160,8 @@ class Game {
         this.ctx.font = '50px Helvetica';
         this.ctx.strokeStyle = 'cyan';
         this.ctx.fillStyle = 'white';
-        this.ctx.strokeText(gameover, 250, 150);
-        this.ctx.fillText(gameover, 250, 150);
+        this.ctx.strokeText(gameover, 230, 150);
+        this.ctx.fillText(gameover, 230, 150);
         this.ctx.font = '30px Helvetica';
         this.ctx.strokeText(tryagain, 130, 180);
         this.ctx.fillText(tryagain, 130, 180);
@@ -170,7 +173,7 @@ class Game {
 
         if (this.gameOver()) {
             this.gameOverMenu();
-            this.restartGame();
+            this.running = false;
         }
 
         this.score.draw(this.ctx);
