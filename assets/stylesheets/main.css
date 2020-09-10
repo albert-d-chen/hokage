@@ -4,3 +4,8 @@
     top: 20%;
     border: 3px solid lime;
 }
+
+@font-face {
+    font-family: 'Naruto';
+    src: url('naruto.ttf') format('truetype')
+}

@@ -98,92 +98,115 @@ const Obstacle = __webpack_require__(/*! ./obstacle */ "./lib/obstacle.js");
 const Score = __webpack_require__(/*! ./score */ "./lib/score.js");
 
 class Game {
-    constructor(ctx, gameCanvas) {
-        this.ctx = ctx;
-        this.gameCanvas = gameCanvas;
+  constructor(ctx, gameCanvas) {
+    this.ctx = ctx;
+    this.gameCanvas = gameCanvas;
 
-        this.player = new Player();
-        this.obstacle = new Obstacle();
+    this.player = new Player();
+    this.obstacle = new Obstacle();
 
-        this.score = new Score();
+    this.score = new Score();
 
-        this.registerEvents();
-        // this.restartGame();
-        // this.restartGame = this.restartGame.bind(this);
+    this.count = 1000;
+
+    this.registerEvents();
+    this.gameStartMenu = this.gameStartMenu.bind(this);
+    // this.restartGame();
+    // this.restartGame = this.restartGame.bind(this);
+  }
+
+  play() {
+    console.log("play");
+    this.running = true;
+    this.animate();
+  }
+
+  registerEvents() {
+    this.boundClickHandler = this.click.bind(this);
+    this.gameCanvas.addEventListener("mousedown", this.boundClickHandler);
+    document.addEventListener("keydown", (event) => {
+      if (event.code === "Space") {
+        this.player.jumping = true;
+      }
+    });
+    this.restart = this.restartGame.bind(this);
+    document.addEventListener("keydown", this.restart);
+  }
+
+  click(e) {
+    if (!this.running && !this.gameOver()) {
+      this.play();
     }
+  }
 
-    play() {
-        console.log("play");
-        this.running = true;
-        this.animate();
+  gameOver() {
+    return this.obstacle.checkCollision(this.player.playerHitBox());
+  }
+
+  restartGame(e) {
+    // debugger
+    if (e.key === "l" && this.gameOver()) {
+      this.score = new Score();
+      this.player = new Player();
+      this.obstacle = new Obstacle();
+      e.preventDefault();
+      this.animate();
     }
+  }
 
-    registerEvents() {
-        this.boundClickHandler = this.click.bind(this);
-        this.gameCanvas.addEventListener("mousedown", this.boundClickHandler);
-        document.addEventListener('keydown', (event) => {
-            if (event.code === 'Space'){
-                this.player.jumping = true;
-            } 
-        })
-        this.restart = this.restartGame.bind(this);
-        document.addEventListener('keydown', this.restart)
+  gameOverMenu() {
+    const gameover = "GAME OVER";
+    const tryagain = "Press L to accept defeat and try again";
+    this.ctx.font = "50px Naruto";
+    this.ctx.strokeStyle = "red";
+    this.ctx.fillStyle = "red";
+    this.ctx.strokeText(gameover, 250, 150);
+    this.ctx.fillText(gameover, 250, 150);
+    this.ctx.font = "30px Naruto";
+    this.ctx.strokeText(tryagain, 80, 200);
+    this.ctx.fillText(tryagain, 80, 200);
+  }
+
+  gameStartMenu() {
+    // this.count--;
+    // if (this.count % 2 === 1) {
+      const gameover = "CLICK TO PLAY";
+      this.ctx.font = "50px Naruto";
+      this.ctx.strokeStyle = "white";
+      this.ctx.fillStyle = "white";
+      this.ctx.strokeText(gameover, 190, 200);
+      this.ctx.fillText(gameover, 190, 200);
+    // } else {
+    //     this.ctx.fillStyle = 'black'
+    //     this.ctx.fillRect(100, 100, 500, 200)
+    // }
+}
+
+drawBackground() {
+    this.ctx.fillStyle = "black ";
+    this.ctx.fillRect(190, 200, 300, 300);
+}
+
+animate() {
+    this.obstacle.animate(this.ctx);
+    this.player.animate(this.ctx);
+    
+    if (!this.running && !this.gameOver()) {
+        this.gameStartMenu();
+        // this.gameStartMenu();
     }
     
-    click(e) {
-        if (!this.running) {
-        this.play();
-        }
-    }
-    
-    gameOver() {
-        return (
-            this.obstacle.checkCollision(this.player.playerHitBox())
-        )
+    if (this.gameOver()) {
+      this.gameOverMenu();
+      this.running = false;
     }
 
-    restartGame(e) {
-            // debugger
-            if (e.key === 'l' && this.gameOver()) {
-                    this.score = new Score();
-                    this.player = new Player();
-                    this.obstacle = new Obstacle();
-                    e.preventDefault();
-                    this.animate();
-                }
-            
+    this.score.draw(this.ctx);
+
+    if (this.running) {
+      requestAnimationFrame(this.animate.bind(this));
     }
-
-    gameOverMenu() {
-        const gameover = 'GAME OVER';
-        const tryagain = 'Press L to accept defeat and try again';
-        this.ctx.font = '50px Helvetica';
-        this.ctx.strokeStyle = 'cyan';
-        this.ctx.fillStyle = 'white';
-        this.ctx.strokeText(gameover, 230, 150);
-        this.ctx.fillText(gameover, 230, 150);
-        this.ctx.font = '30px Helvetica';
-        this.ctx.strokeText(tryagain, 130, 180);
-        this.ctx.fillText(tryagain, 130, 180);
-    }
-
-    animate() {
-        this.obstacle.animate(this.ctx);
-        this.player.animate(this.ctx);
-
-        if (this.gameOver()) {
-            this.gameOverMenu();
-            this.running = false;
-        }
-
-        this.score.draw(this.ctx);
-
-        if (this.running) {
-            requestAnimationFrame(this.animate.bind(this));
-        }
-    }
-
-
+  }
 }
 
 module.exports = Game;
@@ -209,9 +232,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // gameCanvas.width = 700;
     // gameCanvas.height = 400;
 
-    new Game(ctx, gameCanvas);
+    const game = new Game(ctx, gameCanvas);
 
-    // game.play();
+    game.animate();
 
 });
 
@@ -398,9 +421,9 @@ class Score {
     }
 
     draw(ctx) {
-        const yourScore = `Score: ${this.score}`;
-        ctx.font = "25px Helvetica";
-        ctx.strokeStyle = "cyan";
+        const yourScore = `${this.score}`;
+        ctx.font = "30px Naruto";
+        ctx.strokeStyle = "white";
         ctx.lineWidth = 2;
         ctx.fillStyle = "white";
         ctx.textAlign = "left";
