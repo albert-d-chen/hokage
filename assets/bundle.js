@@ -96,6 +96,7 @@
 const Player = __webpack_require__(/*! ./player */ "./lib/player.js");
 const Obstacle = __webpack_require__(/*! ./obstacle */ "./lib/obstacle.js");
 const Score = __webpack_require__(/*! ./score */ "./lib/score.js");
+const Ninja = __webpack_require__(/*! ./ninja */ "./lib/ninja.js");
 
 class Game {
   constructor(ctx, gameCanvas) {
@@ -104,6 +105,7 @@ class Game {
 
     this.player = new Player();
     this.obstacle = new Obstacle();
+    this.ninja = new Ninja();
 
     this.score = new Score();
 
@@ -126,8 +128,13 @@ class Game {
     this.boundClickHandler = this.click.bind(this);
     this.gameCanvas.addEventListener("mousedown", this.boundClickHandler);
     document.addEventListener("keydown", (event) => {
+        // debugger
       if (event.code === "Space") {
         this.player.jumping = true;
+      } 
+      if (event.code === 'KeyQ') {
+        //   debugger
+          this.player.shooting = true;
       }
     });
     this.restart = this.restartGame.bind(this);
@@ -141,8 +148,18 @@ class Game {
   }
 
   gameOver() {
-    return this.obstacle.checkCollision(this.player.playerHitBox());
+    return (
+      this.obstacle.checkCollision(this.player.playerHitBox()) ||
+      this.ninja.checkNinjaCollision(this.player.playerHitBox()) 
+    );
   }
+
+  rasenganHit() {
+    return this.ninja.checkRasenganCollision(this.player.rasenganHitBox())
+  }
+
+
+
 
   restartGame(e) {
     // debugger
@@ -150,6 +167,7 @@ class Game {
       this.score = new Score();
       this.player = new Player();
       this.obstacle = new Obstacle();
+      this.ninja = new Ninja();
       e.preventDefault();
       this.animate();
     }
@@ -189,7 +207,12 @@ drawBackground() {
 }
 
 animate() {
+    if (this.rasenganHit()) {
+        this.ninja.ninjaHit = true;
+        this.player.ninjaHit = true;
+        }
     this.obstacle.animate(this.ctx);
+    this.ninja.animate(this.ctx);
     this.player.animate(this.ctx);
     
     if (!this.running ) {
@@ -199,6 +222,7 @@ animate() {
     
     if (this.gameOver()) {
       this.obstacle.animate(this.ctx);
+      this.ninja.animate(this.ctx);
       this.player.drawGameOverSprite(this.ctx);
       this.gameOverMenu();
       this.running = false;
@@ -239,6 +263,124 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
+
+/***/ }),
+
+/***/ "./lib/ninja.js":
+/*!**********************!*\
+  !*** ./lib/ninja.js ***!
+  \**********************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+class Ninja {
+    constructor() {
+        this.x = 300;
+        this.y = 230;
+        this.speed = 8;
+        this.ninjaHit = false;
+
+        const firstNinjaDistance = this.x + 600
+        this.ninjas = [this.createNinja(firstNinjaDistance + 200), this.createNinja(firstNinjaDistance * 2)];
+    }
+
+    createNinja(x) {
+        const ninja = {
+        oneNinja: {
+            left: x,
+            right: x + 30,
+            top: 300,
+            bottom: 400,
+        },
+        };
+
+        return ninja;
+    }
+
+    eachNinja(callback) {
+        this.ninjas.forEach(callback.bind(this));
+    }
+
+    drawNinja(ctx) {
+        this.eachNinja(function(ninja) {
+                ctx.beginPath();
+                ctx.fillStyle = "orange";
+                ctx.fillRect(ninja.oneNinja.left, this.y + 50, 60, 60);
+                ctx.closePath();
+            }
+        )
+        
+        if (this.ninjas[0].oneNinja.left <= 0 || this.ninjaHit) {
+            this.ninjas.shift();
+            const newNinja = this.ninjas[0].oneNinja.left + 700;
+            this.ninjas.push(this.createNinja(newNinja));
+            this.ninjaHit = false;
+        }
+    }
+
+    move() {
+       
+            this.eachNinja(function(ninja) {
+                ninja.oneNinja.left -= this.speed;
+                // if (this.ninjaHit) {
+                //     // ninja.oneNinja.left = 300;
+                //     this.ninjaHit = false;
+                // }
+            })
+        // this.x -= this.speed;
+    }
+
+    animate(ctx) {
+        this.move();
+        this.drawNinja(ctx);
+    }
+
+    checkNinjaCollision(player) {
+        const _collision = (ninjaBox, playerBox) => {
+            if (ninjaBox.left > playerBox.right || ninjaBox.right < playerBox.left) {
+                return false;
+            }
+            if (ninjaBox.top  > playerBox.bottom || ninjaBox.bottom < playerBox.top) {
+                return false;
+            }
+
+            return true;
+        };
+
+        let hit = false;
+        this.eachNinja((ninja) => {
+            if (_collision(ninja.oneNinja, player)) {
+                hit = true;
+            }
+        });
+        return hit;
+    }
+
+    checkRasenganCollision(rasengan) {
+        const _collision = (ninjaBox, rasenganBox) => {
+            if (ninjaBox.left > rasenganBox.right || ninjaBox.right < rasenganBox.left) {
+                return false;
+            }
+            if (ninjaBox.top  > rasenganBox.bottom || ninjaBox.bottom < rasenganBox.top) {
+                return false;
+            }
+
+            return true;
+        };
+
+        let hit = false;
+        this.eachNinja((ninja) => {
+            if (_collision(ninja.oneNinja, rasengan)) {
+                hit = true;
+            }
+        });
+        return hit;
+    }
+
+
+}
+
+module.exports = Ninja;
 
 /***/ }),
 
@@ -335,15 +477,15 @@ class Obstacle {
         })
     }
 
-    drawObstacle2(ctx) {
-        this.eachObstacle(function(obstacle) {
-                ctx.beginPath();
-                ctx.fillStyle = "orange";
-                ctx.fillRect(obstacle.oneObstacle.left, this.y, 30, 130);
-                ctx.closePath();
-            }
-        )
-    }
+    // drawObstacle2(ctx) {
+    //     this.eachObstacle(function(obstacle) {
+    //             ctx.beginPath();
+    //             ctx.fillStyle = "orange";
+    //             ctx.fillRect(obstacle.oneObstacle.left, this.y, 30, 130);
+    //             ctx.closePath();
+    //         }
+    //     )
+    // }
 
     randomObstacle(max) {
         return Math.floor(Math.random() * Math.floor(max))
@@ -357,7 +499,7 @@ class Obstacle {
         if (this.obstacles[0].oneObstacle.left <= 0) {
             this.obstacles.shift();
             const newObstacle = this.obstacles[0].oneObstacle.left + CONSTANTS.SPACING;
-            this.obstacles.push(this.createObstacle(newObstacle))
+            this.obstacles.push(this.createObstacle(newObstacle));
         }
 
     }
@@ -438,17 +580,18 @@ class Player {
     this.jumpCount = 0;
     this.jumpTimer = 0;
     this.runCycle = 0;
+    this.ninjaHit = false;
+
+
+    this.shootX = 70;
+    this.shootY = 300;
+    this.shooting = false;
+    this.count = 0;
 
     this.spriteSheet = new Image();
     this.spriteSheet.src = './assets/images/narutosprite.png';
   }
 
-//   draw(ctx) {
-//     ctx.beginPath();
-//     ctx.fillStyle = "cyan";
-//     ctx.fillRect(this.x, this.y, 50, 50);
-//     ctx.closePath();
-//   }
 
     draw(ctx) {
         const sprite = this.pickSprite();
@@ -490,7 +633,7 @@ class Player {
         const initialSpeed = 12;
 
         if (this.jumping) {
-        ctx.clearRect(this.x, this.y, 40, 0);
+        // ctx.clearRect(this.x, this.y, 40, 0);
         if (this.jumpCount === 0 || !this.grounded()) {
             this.y -= initialSpeed - gravity * this.jumpCount;
             this.jumpCount += 1;
@@ -507,8 +650,37 @@ class Player {
         return this.x === 25 && this.y >= 280;
     }
 
+    shoot() {
+        this.shootX += 5;
+    }
+
+    drawRasengan(ctx) {
+
+        if (this.shooting) {
+            if (this.count === 0) {
+                this.shootY = this.y + 20;
+            }
+                ctx.beginPath();
+                ctx.arc(this.shootX, this.shootY, 10, 0, 2 * Math.PI, true);
+                ctx.stroke();
+                ctx.fillStyle = "lightblue";
+                ctx.fill();
+                this.count++;
+                this.shoot();
+            
+        } 
+        if (this.shootX > 680 || this.ninjaHit) {
+            this.ninjaHit = false;
+            this.shooting = false;
+            this.shootX = 100;
+            this.count = 0;
+        }
+
+}
+
     animate(ctx) {
         this.jump(ctx);
+        this.drawRasengan(ctx);
         this.draw(ctx);
     }
 
@@ -537,6 +709,15 @@ class Player {
             right: this.x + 60,
             top: this.y,
             bottom: this.y + 70,
+        }
+    }
+
+    rasenganHitBox() {
+        return {
+            left: this.shootX,
+            right: this.shootX ,
+            top: this.shootY,
+            bottom: this.shootY 
         }
     }
 }
