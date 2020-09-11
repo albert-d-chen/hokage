@@ -320,11 +320,6 @@ class Obstacle {
 
     drawObstacle(ctx) {
         this.eachObstacle(function(obstacle) {
-            // ctx.beginPath();
-            // ctx.fillStyle = "orange";
-            // ctx.fillRect(obstacle.oneObstacle.left  , this.y, 30, 130);
-            // ctx.closePath();
-
            
             if (obstacle.oneObstacle.type === 0) {
                 obstacle.oneObstacle.top = 230;
@@ -366,8 +361,7 @@ class Obstacle {
             const newObstacle = this.obstacles[0].oneObstacle.left + CONSTANTS.SPACING;
             this.obstacles.push(this.createObstacle(newObstacle))
         }
-        // this.x -= this.speed;
-        // ctx.clearRect(25, 350, 400, 70  0);
+
     }
 
     drawBackground(ctx) {
@@ -376,7 +370,6 @@ class Obstacle {
         if (this.backgroundx <= -700) {
             this.backgroundx = 0;
         }
-        // ctx.drawImage(this.background, this.x + 700, this.y);
 
         this.moveBackground();
     }
