@@ -175,8 +175,8 @@ class Game {
       this.ctx.font = "50px Naruto";
       this.ctx.strokeStyle = "white";
       this.ctx.fillStyle = "white";
-      this.ctx.strokeText(gameover, 180, 200);
-      this.ctx.fillText(gameover, 180, 200);
+      this.ctx.strokeText(gameover, 170, 200);
+      this.ctx.fillText(gameover, 170, 200);
     // } else {
     //     this.ctx.fillStyle = 'black'
     //     this.ctx.fillRect(100, 100, 500, 200)
@@ -192,7 +192,7 @@ animate() {
     this.obstacle.animate(this.ctx);
     this.player.animate(this.ctx);
     
-    if (!this.running) {
+    if (!this.running ) {
         this.gameStartMenu(); 
         // this.gameStartMenu();
     }
@@ -237,7 +237,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const game = new Game(ctx, gameCanvas);
 
-    game.play();
+    game.animate();
 
 });
 
@@ -256,28 +256,61 @@ const CONSTANTS = {
     SPACING: 500,
 }
 
+const TREE = {
+    tree1: [10, 103, 150, 150],
+    tree2: [380, 21, 130, 280]
+}
+
+const ROCK = {
+    rock1: [0, 0, 395, 400]
+}
+
+const WATER = {
+    water1: [294, 140, 100, 30]
+}
 class Obstacle {
     constructor(options) {
         this.x = 300;
         this.y = 230;
         this.speed = 5;
-        const firstObstacleDistance = this.x + 200;
+        this.backgroundx = 0;
+        this.backgroundy = -50;
 
         this.background = new Image();
         this.background.src =  './assets/images/forest.png';
-        this.obstacles = [this.createObstacle(firstObstacleDistance + 210), this.createObstacle(firstObstacleDistance * 3  )];
+        
+        this.tree = new Image();
+        this.tree.src = './assets/images/trees.png'
+        this.water = new Image();
+        this.water.src = './assets/images/water.png'
+        this.rock = new Image();
+        this.rock.src = './assets/images/rock1.png'
+
+        const firstObstacleDistance = this.x + 200;
+        this.obstacles = [this.createObstacle(firstObstacleDistance + 210), this.createObstacle(firstObstacleDistance * 2.5 )];
     }
 
     createObstacle(x) {
+        // const obstacle = {
+        //     oneObstacle: {  
+        //         left: x,
+        //         right: CONSTANTS.OBSTACLE_WIDTH + x,
+        //         top: this.y,
+        //         bottom: this.y + 130,
+        //         type: this.randomObstacle(2)
+        //     },
+        // }
         const obstacle = {
             oneObstacle: {  
                 left: x,
                 right: CONSTANTS.OBSTACLE_WIDTH + x,
-                top: this.y,
-                bottom: this.y + 130
+                top: 230,
+                bottom: 360,
+                type: this.randomObstacle(3)
             },
-            passed: false
         }
+
+
         return obstacle;
     }
 
@@ -287,14 +320,43 @@ class Obstacle {
 
     drawObstacle(ctx) {
         this.eachObstacle(function(obstacle) {
-            ctx.beginPath();
-            ctx.fillStyle = "orange";
-            ctx.fillRect(obstacle.oneObstacle.left  , this.y, 30, 130);
-            ctx.closePath();
+            // ctx.beginPath();
+            // ctx.fillStyle = "orange";
+            // ctx.fillRect(obstacle.oneObstacle.left  , this.y, 30, 130);
+            // ctx.closePath();
+
+           
+            if (obstacle.oneObstacle.type === 0) {
+                obstacle.oneObstacle.top = 230;
+                obstacle.oneObstacle.bottom = 360;
+                ctx.drawImage(this.tree, TREE.tree1[0], TREE.tree1[1], TREE.tree1[2], TREE.tree1[3], obstacle.oneObstacle.left, this.y - 50, 140, 150)
+            } else if (obstacle.oneObstacle.type === 1) {
+                obstacle.oneObstacle.top = 350;
+                obstacle.oneObstacle.bottom = 450;
+                ctx.drawImage(this.water, WATER.water1[0], WATER.water1[1], WATER.water1[2], WATER.water1[3], obstacle.oneObstacle.left, this.y + 99, 100, 20)
+            } else if (obstacle.oneObstacle.type === 2) {
+                obstacle.oneObstacle.top = 300;
+                obstacle.oneObstacle.bottom = 400;
+                ctx.drawImage(this.rock, ROCK.rock1[0], ROCK.rock1[1], ROCK.rock1[2], ROCK.rock1[3], obstacle.oneObstacle.left, this.y + 30, 100, 80)
+            }
         })
     }
 
-    move(ctx) {
+    drawObstacle2(ctx) {
+        this.eachObstacle(function(obstacle) {
+                ctx.beginPath();
+                ctx.fillStyle = "orange";
+                ctx.fillRect(obstacle.oneObstacle.left, this.y, 30, 130);
+                ctx.closePath();
+            }
+        )
+    }
+
+    randomObstacle(max) {
+        return Math.floor(Math.random() * Math.floor(max))
+    }
+
+    move() {
         this.eachObstacle(function(obstacle) {
             obstacle.oneObstacle.left -= this.speed;
         })
@@ -308,19 +370,27 @@ class Obstacle {
         // ctx.clearRect(25, 350, 400, 70  0);
     }
 
-    // drawBackground(ctx) {
-    //     ctx.fillStyle = "black";
-    //     ctx.fillRect(0, 0, 800, 700);
-    // }
-
     drawBackground(ctx) {
-        ctx.drawImage(this.background, 0, -50);
+        ctx.drawImage(this.background, this.backgroundx, this.backgroundy);
+        ctx.drawImage(this.background, this.backgroundx + 700, this.backgroundy);
+        if (this.backgroundx <= -700) {
+            this.backgroundx = 0;
+        }
+        // ctx.drawImage(this.background, this.x + 700, this.y);
+
+        this.moveBackground();
+    }
+
+    moveBackground() {
+        this.backgroundx -= this.speed;
     }
 
     animate(ctx) { 
         this.drawBackground(ctx);
         this.move(ctx);
         this.drawObstacle(ctx);
+
+
     }
 
     checkCollision(player) {
@@ -328,10 +398,10 @@ class Obstacle {
             if (obstacleBox.left > playerBox.right || obstacleBox.right < playerBox.left) {
                 return false;
             }
-            if (obstacleBox.top > playerBox.bottom || obstacleBox.bottom < playerBox.top) {
+            if (obstacleBox.top  > playerBox.bottom || obstacleBox.bottom < playerBox.top) {
                 return false;
             }
-            
+
             return true;
         };
 
@@ -364,7 +434,7 @@ const NARUTO = {
     run4: [380, 291, 50, 50],
     run5: [500, 291, 50, 50],
     run6: [620, 291, 50, 50],
-    hit: [852, 182, 50, 50]
+    hit: [852, 182, 60, 60]
 
 }
 class Player {
@@ -372,7 +442,7 @@ class Player {
     // this.position = options.position;
     this.vel = 0;
     this.x = 25;
-    this.y = 300;
+    this.y = 280;
     this.jumping = false;
     this.jumpCount = 0;
     this.jumpTimer = 0;
@@ -436,14 +506,14 @@ class Player {
         }
         }
         if (this.jumpCount > 60) {
-        this.y = 300;
+        this.y = 280;
         this.jumpCount = 0;
         this.jumping = false;
         }
     }
 
     grounded() {
-        return this.x === 25 && this.y >= 300;
+        return this.x === 25 && this.y >= 280;
     }
 
     animate(ctx) {
@@ -473,9 +543,9 @@ class Player {
     playerHitBox() {
         return {
             left: this.x,
-            right: this.x + 75,
+            right: this.x + 60,
             top: this.y,
-            bottom: this.y + 50,
+            bottom: this.y + 70,
         }
     }
 }
