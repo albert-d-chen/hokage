@@ -262,7 +262,7 @@ const TREE = {
 }
 
 const ROCK = {
-    rock1: [0, 0, 395, 400]
+    rock1: [0, 0, 80, 80]
 }
 
 const WATER = {
@@ -284,7 +284,7 @@ class Obstacle {
         this.water = new Image();
         this.water.src = './assets/images/water.png'
         this.rock = new Image();
-        this.rock.src = './assets/images/rock1.png'
+        this.rock.src = './assets/images/boulder1.png'
 
         const firstObstacleDistance = this.x + 200;
         this.obstacles = [this.createObstacle(firstObstacleDistance + 210), this.createObstacle(firstObstacleDistance * 2.5 )];
