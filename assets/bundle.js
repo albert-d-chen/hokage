@@ -272,13 +272,26 @@ document.addEventListener("DOMContentLoaded", function () {
 /***/ (function(module, exports) {
 
 const KISAME = {
-    run1: [409, 1, 70, 60],
-    run2: [328, 3, 73, 60],
-    run3: [248, 2, 73, 60],
-    run4: [162, 1, 73, 60],
-    run5: [82, 1, 73, 60],
-    run6: [1, 2, 73, 60],
+    run1: [7, 72, 73, 80],
+    run2: [87, 73, 73, 80],
+    run3: [170, 74, 73, 80],
+    run4: [252, 76, 73, 80],
+    run5: [331, 81, 73, 80],
+    run6: [413, 82, 73, 80],
+    strike1: [252, 2, 73, 80],
+    strike2: [330, 6, 73, 80],
 }
+
+const DEIDARA = {
+    fly1: [25, 13, 150, 120],
+    fly2: [169, 17, 150, 120],
+    fly3: [320, 15, 150, 120],
+    fly4: [462, 10, 150, 120],
+    fly5: [614, 3, 150, 120],
+    fly6: [764, 9, 150, 120],
+}
+
+
 
 class Ninja {
   constructor() {
@@ -289,7 +302,10 @@ class Ninja {
 
     this.kisameCycle = 0;
     this.kisame = new Image();
-    this.kisame.src = "./assets/images/kisame.png";
+    this.kisame.src = "./assets/images/kisame1.png";
+    this.deidaraCycle = 0;
+    this.deidara = new Image();
+    this.deidara.src = './assets/images/deidara.png';
 
     const firstNinjaDistance = this.x + 600;
     this.ninjas = [
@@ -305,6 +321,7 @@ class Ninja {
         right: x + 30,
         top: 300,
         bottom: 400,
+        type: 1
       },
     };
 
@@ -334,16 +351,59 @@ class Ninja {
     } else if (this.kisameCycle < 110) {
       this.kisameCycle += 1;
       return KISAME.run6;
-    } else if (this.kisameCycle < 130) {
+    } else if (this.kisameCycle < 140) {
+      this.kisameCycle += 1;
+      return KISAME.strike1;
+    } else if (this.kisameCycle < 170) {
+      this.kisameCycle += 1;
+      return KISAME.strike2;
+    } else if (this.kisameCycle < 200) {
+      this.kisameCycle += 1;
+      return KISAME.strike1;
+    } else if (this.kisameCycle < 220) {
       this.kisameCycle = 0;
       return KISAME.run1;
     }
   }
 
+  pickDeidara() {
+      if (this.deidaraCycle < 10) {
+        this.deidaraCycle += 1;
+        return DEIDARA.fly1;
+      } else if (this.deidaraCycle < 30) {
+        this.deidaraCycle += 1;
+        return DEIDARA.fly2;
+      } else if (this.deidaraCycle < 50) {
+        this.deidaraCycle += 1;
+        return DEIDARA.fly3;
+      } else if (this.deidaraCycle < 70) {
+        this.deidaraCycle += 1;
+        return DEIDARA.fly4;
+      } else if (this.deidaraCycle < 90) {
+        this.deidaraCycle += 1;
+        return DEIDARA.fly5;
+      } else if (this.deidaraCycle < 110) {
+        this.deidaraCycle += 1;
+        return DEIDARA.fly6;
+      } else if (this.deidaraCycle < 130) {
+        this.deidaraCycle = 0;
+        return DEIDARA.fly1;
+      }
+  }
+
   drawNinja(ctx) {
     this.eachNinja(function (ninja) {
-        const sprite = this.pickKisame();
-        ctx.drawImage(this.kisame, sprite[0], sprite[1], sprite[2], sprite[3], ninja.oneNinja.left, this.y + 30, 70, 70);
+        if (ninja.oneNinja.type === 0) {
+            ninja.oneNinja.top = 300;
+            ninja.oneNinja.bottom = 400;
+            const sprite = this.pickKisame();
+            ctx.drawImage(this.kisame, sprite[0], sprite[1], sprite[2], sprite[3], ninja.oneNinja.left, this.y + 30, 80, 80);
+        } else if (ninja.oneNinja.type === 1) {
+            ninja.oneNinja.top = 100;
+            ninja.oneNinja.bottom = 200;
+            const sprite = this.pickDeidara();
+            ctx.drawImage(this.deidara, sprite[0], sprite[1], sprite[2], sprite[3], ninja.oneNinja.left, this.y - 150, 100, 100);
+        }
     });
 
     if (this.ninjas[0].oneNinja.left <= 0 || this.ninjaHit) {
@@ -353,6 +413,10 @@ class Ninja {
       this.ninjaHit = false;
     }
   }
+
+  randomNinja(max) {
+        return Math.floor(Math.random() * Math.floor(max))
+    }
 
   move() {
     this.eachNinja(function (ninja) {
