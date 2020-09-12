@@ -291,7 +291,16 @@ const DEIDARA = {
     fly6: [764, 9, 150, 120],
 }
 
-
+const OROCHI = {
+    run1: [3, 55, 50, 45],
+    run2: [51, 57, 50, 45],
+    run3: [106, 54, 50, 45],
+    run4: [153, 55, 50, 45],
+    run5: [256, 56, 50, 45],
+    strike1: [258, 1, 50, 45],
+    strike2: [82, 0, 70, 45],
+    strike3: [2, 1, 70, 45]
+};
 
 class Ninja {
   constructor() {
@@ -306,6 +315,9 @@ class Ninja {
     this.deidaraCycle = 0;
     this.deidara = new Image();
     this.deidara.src = './assets/images/deidara.png';
+    this.orochiCycle = 0;
+    this.orochi = new Image();
+    this.orochi.src = './assets/images/orochimaru.png';
 
     const firstNinjaDistance = this.x + 600;
     this.ninjas = [
@@ -321,7 +333,7 @@ class Ninja {
         right: x + 30,
         top: 300,
         bottom: 400,
-        type: 1
+        type: this.randomNinja(5)
       },
     };
 
@@ -391,24 +403,60 @@ class Ninja {
       }
   }
 
+  pickOrochi() {
+      if (this.orochiCycle < 20) {
+        this.orochiCycle += 1;
+        return OROCHI.run1;
+      } else if (this.orochiCycle < 50) {
+        this.orochiCycle += 1;
+        return OROCHI.run2;
+      } else if (this.orochiCycle < 80) {
+        this.orochiCycle += 1;
+        return OROCHI.run3;
+      } else if (this.orochiCycle < 110) {
+        this.orochiCycle += 1;
+        return OROCHI.run4;
+      } else if (this.orochiCycle < 140) {
+        this.orochiCycle += 1;
+        return OROCHI.strike1;
+      } else if (this.orochiCycle < 170) {
+        this.orochiCycle += 1;
+        return OROCHI.strike2;
+      } else if (this.orochiCycle < 200) {
+        this.orochiCycle += 1;
+        return OROCHI.strike3;
+      } else if (this.orochiCycle < 230) {
+        this.orochiCycle += 1;
+        return OROCHI.strike1;
+      } else if (this.orochiCycle < 260) {
+        this.orochiCycle = 0;
+        return OROCHI.run1;
+      }
+  }
+
   drawNinja(ctx) {
     this.eachNinja(function (ninja) {
-        if (ninja.oneNinja.type === 0) {
+        if (ninja.oneNinja.type === 0 || ninja.oneNinja.type === 1) {
             ninja.oneNinja.top = 300;
             ninja.oneNinja.bottom = 400;
             const sprite = this.pickKisame();
             ctx.drawImage(this.kisame, sprite[0], sprite[1], sprite[2], sprite[3], ninja.oneNinja.left, this.y + 30, 80, 80);
-        } else if (ninja.oneNinja.type === 1) {
+        } else if (ninja.oneNinja.type === 4) {
             ninja.oneNinja.top = 100;
             ninja.oneNinja.bottom = 200;
             const sprite = this.pickDeidara();
             ctx.drawImage(this.deidara, sprite[0], sprite[1], sprite[2], sprite[3], ninja.oneNinja.left, this.y - 150, 100, 100);
+        } else if (ninja.oneNinja.type === 2 || ninja.oneNinja.type === 3) {
+            ninja.oneNinja.top = 300;
+            ninja.oneNinja.bottom = 400;
+            const sprite = this.pickOrochi();
+            ctx.drawImage(this.orochi, sprite[0], sprite[1], sprite[2], sprite[3], ninja.oneNinja.left, this.y + 35, 80, 80);
         }
     });
 
     if (this.ninjas[0].oneNinja.left <= 0 || this.ninjaHit) {
       this.ninjas.shift();
-      const newNinja = this.ninjas[0].oneNinja.left + 900;
+      const newNinja = this.ninjas[0].oneNinja.left + 1300;
       this.ninjas.push(this.createNinja(newNinja));
       this.ninjaHit = false;
     }
