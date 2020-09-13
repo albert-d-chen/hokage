@@ -152,14 +152,16 @@ class Game {
 
   handleMusic(e) {
         e.preventDefault();
-        if (this.musicBtn.classList.contains("fa-volume-mute")) {
-        this.music.play();
-        this.musicBtn.classList.remove("fa-volume-mute");
-        this.musicBtn.classList.add("fa-volume-up");
-        } else if (this.musicBtn.classList.contains("fa-volume-up")) {
-        this.music.pause();
-        this.musicBtn.classList.remove("fa-volume-up");
-        this.musicBtn.classList.add("fa-volume-mute");
+        if (this.running) {
+            if (this.musicBtn.classList.contains("fa-volume-mute")) {
+            this.music.play();
+            this.musicBtn.classList.remove("fa-volume-mute");
+            this.musicBtn.classList.add("fa-volume-up");
+            } else if (this.musicBtn.classList.contains("fa-volume-up")) {
+            this.music.pause();
+            this.musicBtn.classList.remove("fa-volume-up");
+            this.musicBtn.classList.add("fa-volume-mute");
+            }
         }
   }
 
@@ -211,19 +213,12 @@ class Game {
   }
 
   gameStartMenu() {
-    // this.count--;
-    // if (this.count % 2 === 1) {
         const gameover = "CLICK TO PLAY";
         this.ctx.font = "50px Naruto";
         this.ctx.strokeStyle = "white";
         this.ctx.fillStyle = "white";
         this.ctx.strokeText(gameover, 170, 200);
         this.ctx.fillText(gameover, 170, 200);
-
-    // } else {
-    //     this.ctx.fillStyle = 'black'
-    //     this.ctx.fillRect(100, 100, 500, 200)
-    // }
   }
 
   drawBackground() {
@@ -350,8 +345,8 @@ class Ninja {
         this.orochi = new Image();
         this.orochi.src = './assets/images/orochimaru.png';
 
-        const firstNinjaDistance = this.x + 7000;
-        const secondNinjaDistance = this.x + 10000;
+        const firstNinjaDistance = this.x + 7500;
+        const secondNinjaDistance = this.x + 9500;
         this.ninjas = [
         this.createNinja(firstNinjaDistance + 100),
         this.createNinja(secondNinjaDistance),
@@ -365,7 +360,7 @@ class Ninja {
             right: x + 30,
             top: 300,
             bottom: 400,
-            type: this.randomNinja(5)
+            type: this.randomNinja(7)
         },
         };
 
@@ -468,7 +463,7 @@ class Ninja {
 
   drawNinja(ctx) {
         this.eachNinja(function (ninja) {
-            if (ninja.oneNinja.type === 0 || ninja.oneNinja.type === 1) {
+            if (ninja.oneNinja.type === 0 || ninja.oneNinja.type === 1 || ninja.oneNinja.type === 5) {
                 ninja.oneNinja.top = 300;
                 ninja.oneNinja.bottom = 400;
                 const sprite = this.pickKisame();
@@ -478,7 +473,7 @@ class Ninja {
                 ninja.oneNinja.bottom = 200;
                 const sprite = this.pickDeidara();
                 ctx.drawImage(this.deidara, sprite[0], sprite[1], sprite[2], sprite[3], ninja.oneNinja.left, this.y - 150, 100, 100);
-            } else if (ninja.oneNinja.type === 2 || ninja.oneNinja.type === 3) {
+            } else if (ninja.oneNinja.type === 2 || ninja.oneNinja.type === 3 || ninja.oneNinja.type === 6) {
                 ninja.oneNinja.top = 300;
                 ninja.oneNinja.bottom = 400;
                 const sprite = this.pickOrochi();
