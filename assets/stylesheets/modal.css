@@ -42,7 +42,7 @@
     position: relative;
     display: flex;
     left: 15%;
-    top: -20px;
+    top: 20px;
 }
 .instructions {
     color: white;
@@ -71,7 +71,7 @@
     display: flex;
     color: white;
     font-family: 'Baloo Tamma 2', cursive;
-    top: 350px;
+    top: 370px;
     left: 15%;
 }
 
@@ -94,23 +94,25 @@
     color: cyan;
     font-size: 80px;
     position: relative;
-    top: -10px;
+    top: 20px;
     left: -10px;
 }
 .social-github {
     position: relative;
     left: -30px;
+    top: 25px;
 }
 
 .social-linkedin{
     position: relative;
     left: 10px;
+    top: 25px;
 }
 
 .sound {
     position: relative;
     color: white;
     left: 71%;
-    top: 20px;
+    top: 60px;
     z-index: 100;
 }

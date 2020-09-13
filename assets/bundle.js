@@ -202,6 +202,7 @@ class Game {
   gameOverMenu() {
         const gameover = "GAME OVER";
         const tryagain = "Press L to accept defeat and try again";
+        const yourscore = `Score    ${this.score.score}`
         this.ctx.font = "50px Naruto";
         this.ctx.strokeStyle = "red";
         this.ctx.fillStyle = "red";
@@ -210,6 +211,12 @@ class Game {
         this.ctx.font = "30px Naruto";
         this.ctx.strokeText(tryagain, 60, 200);
         this.ctx.fillText(tryagain, 60, 200);
+        this.ctx.font = '30px Naruto';
+        this.ctx.strokeStyle = "white";
+        this.ctx.fillStyle = "white";
+        this.ctx.strokeText(yourscore, 260, 250);
+        this.ctx.fillText(yourscore, 260, 250);
+
   }
 
   gameStartMenu() {
@@ -346,7 +353,7 @@ class Ninja {
         this.orochi.src = './assets/images/orochimaru.png';
 
         const firstNinjaDistance = this.x + 7500;
-        const secondNinjaDistance = this.x + 9500;
+        const secondNinjaDistance = this.x + 10000;
         this.ninjas = [
         this.createNinja(firstNinjaDistance + 100),
         this.createNinja(secondNinjaDistance),
