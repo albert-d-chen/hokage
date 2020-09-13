@@ -679,7 +679,7 @@ class Obstacle {
 
         if (this.obstacles[0].oneObstacle.left <= 0) {
             this.obstacles.shift();
-            const newObstacle = this.obstacles[0].oneObstacle.left + CONSTANTS.SPACING;
+            const newObstacle = this.obstacles[0].oneObstacle.left + CONSTANTS.SPACING + 100;
             this.obstacles.push(this.createObstacle(newObstacle));
         }
 
