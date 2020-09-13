@@ -6,9 +6,41 @@
     <title>Hokage</title>
     
     <link rel="stylesheet" type="text/css" href="./assets/stylesheets/main.css" />
+    <link rel="stylesheet" type="text/css" href="./assets/stylesheets/modal.css" />
+    <link rel="stylesheet" type="text/css" href="./assets/stylesheets/reset.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+Tamma+2&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/c79d7c6c30.js" crossorigin="anonymous"></script>
     <script type="application/javascript" src="./assets/bundle.js"></script>
 </head>
-<body>
+
+
+<body class='background'>
+    <div class='socials'>
+        <a href="https://github.com/albert-d-chen" target='_blank'><i class="fab fa-github fa-4x social-github"
+                style="color: white"></i></a>
+        <div class='title'>HOKAGE</div>
+        <a href="https://linkedin.com/in/albertdchen" target="_blank"><i class="fab fa-linkedin fa-4x social-linkedin"
+                style="color: white"></i></a>
+    </div>
+    <audio id="music">
+        <source src="./assets/sounds/myhero.mp3">
+    </audio>
+    <i id='music-btn' class="fas fa-volume-mute fa-2x sound"></i>
+    
+    
+    <div id='modal' class='modal-on'>
+        <div class='modal-background'></div>
+        <div class='modal-story'>Everyone has turned their backs on you because you possess the Kyuubi.</div>
+        <div class='modal-line'>Prove them wrong on your journey to become Hokage</div>
+    </div>
     <canvas id="game-canvas" height='350' width='700'></canvas>
+    <div class='backstory'>
+        <div class='instructions'>Instructions
+            <div class='jump'>SPACE: &nbsp;JUMP</div>
+            <div class='attack'>Q: &nbsp; ATTACK</div>
+            <div class='disclaimer'>Remember you only have enough chakra for one attack at a time.</div>
+        </div>
+    </div>
 </body>
 </html>

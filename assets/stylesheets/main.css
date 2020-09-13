@@ -2,10 +2,17 @@
     position: absolute;
     left: 25%;
     top: 20%;
-    border: 3px solid lime;
+    border: 3px solid cyan;
+    display:flex;
 }
 
 @font-face {
     font-family: 'Naruto';
     src: url('naruto.ttf') format('truetype')
 }
+
+/* .background{
+    background-color: black;
+    width: 100%;
+    height: 100%;
+} */

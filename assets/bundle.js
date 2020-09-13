@@ -100,138 +100,169 @@ const Ninja = __webpack_require__(/*! ./ninja */ "./lib/ninja.js");
 
 class Game {
   constructor(ctx, gameCanvas) {
-    this.ctx = ctx;
-    this.gameCanvas = gameCanvas;
+        this.ctx = ctx;
+        this.gameCanvas = gameCanvas;
 
-    this.player = new Player();
-    this.obstacle = new Obstacle();
-    this.ninja = new Ninja();
+        this.player = new Player();
+        this.obstacle = new Obstacle();
+        this.ninja = new Ninja();
 
-    this.score = new Score();
+        this.score = new Score();
 
-    this.playerDown = false;
+        this.playerDown = false;
 
-    this.count = 1000;
-    this.registerEvents();
-    this.gameStartMenu = this.gameStartMenu.bind(this);
-    // this.restartGame();
-    // this.restartGame = this.restartGame.bind(this);
+        this.count = 1000;
+        this.registerEvents();
+        this.gameStartMenu = this.gameStartMenu.bind(this);
+        // this.restartGame();
+        // this.restartGame = this.restartGame.bind(this);
   }
 
   play() {
-    console.log("play");
-    this.running = true;
-    this.animate();
+        console.log("play");
+        this.running = true;
+        this.modalEl.classList.remove("modal-on");
+        this.modalEl.classList.add("modal-off");
+        this.animate();
   }
 
   registerEvents() {
-    this.boundClickHandler = this.click.bind(this);
-    this.gameCanvas.addEventListener("mousedown", this.boundClickHandler);
-    document.addEventListener("keydown", (event) => {
+        this.modalEl = document.getElementById("modal");
+        this.musicBtn = document.getElementById("music-btn");
+        this.music = document.getElementById("music");
+
+        this.musicEvent = this.handleMusic.bind(this);
+        this.musicBtn.addEventListener("click", this.musicEvent);
+
+        this.boundClickHandler = this.click.bind(this);
+        this.gameCanvas.addEventListener("mousedown", this.boundClickHandler);
+        document.addEventListener("keydown", (event) => {
         // debugger
-      if (event.code === "Space") {
-        this.player.jumping = true;
-      } 
-      if (event.code === 'KeyQ') {
-        //   debugger
-          this.player.shooting = true;
-      }
-    });
-    this.restart = this.restartGame.bind(this);
-    document.addEventListener("keydown", this.restart);
+        if (event.code === "Space") {
+            this.player.jumping = true;
+        }
+        if (event.code === "KeyQ") {
+            //   debugger
+            this.player.shooting = true;
+        }
+        });
+        this.restart = this.restartGame.bind(this);
+        document.addEventListener("keydown", this.restart);
+  }
+
+  handleMusic(e) {
+        e.preventDefault();
+        if (this.musicBtn.classList.contains("fa-volume-mute")) {
+        this.music.play();
+        this.musicBtn.classList.remove("fa-volume-mute");
+        this.musicBtn.classList.add("fa-volume-up");
+        } else if (this.musicBtn.classList.contains("fa-volume-up")) {
+        this.music.pause();
+        this.musicBtn.classList.remove("fa-volume-up");
+        this.musicBtn.classList.add("fa-volume-mute");
+        }
   }
 
   click(e) {
-    if (!this.running && !this.gameOver()) {
-      this.play();
-    }
+        if (!this.running && !this.gameOver()) {
+        this.play();
+        if (this.musicBtn.classList.contains("fa-volume-mute")) {
+          this.music.play();
+          this.musicBtn.classList.remove("fa-volume-mute");
+          this.musicBtn.classList.add("fa-volume-up");
+        } 
+        }
   }
 
   gameOver() {
-    return (
-      this.obstacle.checkCollision(this.player.playerHitBox()) || this.ninja.checkNinjaCollision(this.player.playerHitBox()) 
-    );
+        return (
+        this.obstacle.checkCollision(this.player.playerHitBox()) ||
+        this.ninja.checkNinjaCollision(this.player.playerHitBox())
+        );
   }
 
   rasenganHit() {
-    return this.ninja.checkRasenganCollision(this.player.rasenganHitBox())
+        return this.ninja.checkRasenganCollision(this.player.rasenganHitBox());
   }
-
-
-
 
   restartGame(e) {
     // debugger
-    if (e.key === "l" && this.gameOver()) {
-      this.score = new Score();
-      this.player = new Player();
-      this.obstacle = new Obstacle();
-      this.ninja = new Ninja();
-      e.preventDefault();
-      this.animate();
-    }
+        if (e.key === "l" && this.gameOver()) {
+        this.score = new Score();
+        this.player = new Player();
+        this.obstacle = new Obstacle();
+        this.ninja = new Ninja();
+        e.preventDefault();
+        this.animate();
+        }
   }
 
   gameOverMenu() {
-    const gameover = "GAME OVER";
-    const tryagain = "Press L to accept defeat and try again";
-    this.ctx.font = "50px Naruto";
-    this.ctx.strokeStyle = "red";
-    this.ctx.fillStyle = "red";
-    this.ctx.strokeText(gameover, 230, 150);
-    this.ctx.fillText(gameover, 230, 150);
-    this.ctx.font = "30px Naruto";
-    this.ctx.strokeText(tryagain, 60, 200);
-    this.ctx.fillText(tryagain, 60, 200);
+        const gameover = "GAME OVER";
+        const tryagain = "Press L to accept defeat and try again";
+        this.ctx.font = "50px Naruto";
+        this.ctx.strokeStyle = "red";
+        this.ctx.fillStyle = "red";
+        this.ctx.strokeText(gameover, 230, 150);
+        this.ctx.fillText(gameover, 230, 150);
+        this.ctx.font = "30px Naruto";
+        this.ctx.strokeText(tryagain, 60, 200);
+        this.ctx.fillText(tryagain, 60, 200);
   }
 
   gameStartMenu() {
     // this.count--;
     // if (this.count % 2 === 1) {
-      const gameover = "CLICK TO PLAY";
-      this.ctx.font = "50px Naruto";
-      this.ctx.strokeStyle = "white";
-      this.ctx.fillStyle = "white";
-      this.ctx.strokeText(gameover, 170, 200);
-      this.ctx.fillText(gameover, 170, 200);
+        const gameover = "CLICK TO PLAY";
+        this.ctx.font = "50px Naruto";
+        this.ctx.strokeStyle = "white";
+        this.ctx.fillStyle = "white";
+        this.ctx.strokeText(gameover, 170, 200);
+        this.ctx.fillText(gameover, 170, 200);
+
     // } else {
     //     this.ctx.fillStyle = 'black'
     //     this.ctx.fillRect(100, 100, 500, 200)
     // }
-}
+  }
 
-drawBackground() {
-    this.ctx.fillStyle = "black ";
-    this.ctx.fillRect(190, 200, 300, 300);
-}
+  drawBackground() {
+        this.ctx.fillStyle = "black ";
+        this.ctx.fillRect(190, 200, 300, 300);
+  }
 
-animate() {
+  animate() {
     if (this.rasenganHit() && this.player.shooting) {
         this.ninja.ninjaHit = true;
         this.player.ninjaHit = true;
+        }
+        this.obstacle.animate(this.ctx);
+        this.player.animate(this.ctx);
+        this.ninja.animate(this.ctx);
+
+    if (!this.running) {
+        this.gameStartMenu();
     }
-    this.obstacle.animate(this.ctx);
-    this.player.animate(this.ctx);
-    this.ninja.animate(this.ctx);
-    
-    if (!this.running ) {
-        this.gameStartMenu(); 
-    }
-    
+
     if (this.gameOver()) {
-      this.obstacle.animate(this.ctx);
-      this.ninja.animate(this.ctx);
-      this.player.drawGameOverSprite(this.ctx);
-      this.gameOverMenu();
-      this.running = false;
+        this.obstacle.animate(this.ctx);
+        this.ninja.animate(this.ctx);
+        this.player.drawGameOverSprite(this.ctx);
+        this.gameOverMenu();
+        this.running = false;
+        if (this.musicBtn.classList.contains("fa-volume-up")) {
+            this.music.pause();
+            this.musicBtn.classList.remove("fa-volume-up");
+            this.musicBtn.classList.add("fa-volume-mute");
+            this.music.currentTime = 0;
+        }
     }
 
-    this.score.draw(this.ctx);
-
-    if (this.running) {  
-      requestAnimationFrame(this.animate.bind(this));
+    if (this.running) {
+        this.score.draw(this.ctx);
+        requestAnimationFrame(this.animate.bind(this));
     }
-  } 
+  }
 }
 
 module.exports = Game;
@@ -303,163 +334,164 @@ const OROCHI = {
 };
 
 class Ninja {
-  constructor() {
-    this.x = 300;
-    this.y = 230;
-    this.speed = 8;
-    this.ninjaHit = false;
+    constructor() {
+        this.x = 300;
+        this.y = 230;
+        this.speed = 8;
+        this.ninjaHit = false;
 
-    this.kisameCycle = 0;
-    this.kisame = new Image();
-    this.kisame.src = "./assets/images/kisame1.png";
-    this.deidaraCycle = 0;
-    this.deidara = new Image();
-    this.deidara.src = './assets/images/deidara.png';
-    this.orochiCycle = 0;
-    this.orochi = new Image();
-    this.orochi.src = './assets/images/orochimaru.png';
+        this.kisameCycle = 0;
+        this.kisame = new Image();
+        this.kisame.src = "./assets/images/kisame1.png";
+        this.deidaraCycle = 0;
+        this.deidara = new Image();
+        this.deidara.src = './assets/images/deidara.png';
+        this.orochiCycle = 0;
+        this.orochi = new Image();
+        this.orochi.src = './assets/images/orochimaru.png';
 
-    const firstNinjaDistance = this.x + 600;
-    this.ninjas = [
-      this.createNinja(firstNinjaDistance + 200),
-      this.createNinja(firstNinjaDistance * 2),
-    ];
+        const firstNinjaDistance = this.x + 7000;
+        const secondNinjaDistance = this.x + 10000;
+        this.ninjas = [
+        this.createNinja(firstNinjaDistance + 100),
+        this.createNinja(secondNinjaDistance),
+        ];
   }
 
   createNinja(x) {
-    const ninja = {
-      oneNinja: {
-        left: x,
-        right: x + 30,
-        top: 300,
-        bottom: 400,
-        type: this.randomNinja(5)
-      },
-    };
+        const ninja = {
+        oneNinja: {
+            left: x,
+            right: x + 30,
+            top: 300,
+            bottom: 400,
+            type: this.randomNinja(5)
+        },
+        };
 
-    return ninja;
+        return ninja;
   }
 
   eachNinja(callback) {
-    this.ninjas.forEach(callback.bind(this));
+        this.ninjas.forEach(callback.bind(this));
   }
 
   pickKisame() {
-    if (this.kisameCycle < 10) {
-      this.kisameCycle += 1;
-      return KISAME.run1;
-    } else if (this.kisameCycle < 30) {
-      this.kisameCycle += 1;
-      return KISAME.run2;
-    } else if (this.kisameCycle < 50) {
-      this.kisameCycle += 1;
-      return KISAME.run3;
-    } else if (this.kisameCycle < 70) {
-      this.kisameCycle += 1;
-      return KISAME.run4;
-    } else if (this.kisameCycle < 90) {
-      this.kisameCycle += 1;
-      return KISAME.run5;
-    } else if (this.kisameCycle < 110) {
-      this.kisameCycle += 1;
-      return KISAME.run6;
-    } else if (this.kisameCycle < 140) {
-      this.kisameCycle += 1;
-      return KISAME.strike1;
-    } else if (this.kisameCycle < 170) {
-      this.kisameCycle += 1;
-      return KISAME.strike2;
-    } else if (this.kisameCycle < 200) {
-      this.kisameCycle += 1;
-      return KISAME.strike1;
-    } else if (this.kisameCycle < 220) {
-      this.kisameCycle = 0;
-      return KISAME.run1;
-    }
+        if (this.kisameCycle < 10) {
+        this.kisameCycle += 1;
+        return KISAME.run1;
+        } else if (this.kisameCycle < 30) {
+        this.kisameCycle += 1;
+        return KISAME.run2;
+        } else if (this.kisameCycle < 50) {
+        this.kisameCycle += 1;
+        return KISAME.run3;
+        } else if (this.kisameCycle < 70) {
+        this.kisameCycle += 1;
+        return KISAME.run4;
+        } else if (this.kisameCycle < 90) {
+        this.kisameCycle += 1;
+        return KISAME.run5;
+        } else if (this.kisameCycle < 110) {
+        this.kisameCycle += 1;
+        return KISAME.run6;
+        } else if (this.kisameCycle < 140) {
+        this.kisameCycle += 1;
+        return KISAME.strike1;
+        } else if (this.kisameCycle < 170) {
+        this.kisameCycle += 1;
+        return KISAME.strike2;
+        } else if (this.kisameCycle < 200) {
+        this.kisameCycle += 1;
+        return KISAME.strike1;
+        } else if (this.kisameCycle < 220) {
+        this.kisameCycle = 0;
+        return KISAME.run1;
+        }
   }
 
   pickDeidara() {
-      if (this.deidaraCycle < 10) {
-        this.deidaraCycle += 1;
-        return DEIDARA.fly1;
-      } else if (this.deidaraCycle < 30) {
-        this.deidaraCycle += 1;
-        return DEIDARA.fly2;
-      } else if (this.deidaraCycle < 50) {
-        this.deidaraCycle += 1;
-        return DEIDARA.fly3;
-      } else if (this.deidaraCycle < 70) {
-        this.deidaraCycle += 1;
-        return DEIDARA.fly4;
-      } else if (this.deidaraCycle < 90) {
-        this.deidaraCycle += 1;
-        return DEIDARA.fly5;
-      } else if (this.deidaraCycle < 110) {
-        this.deidaraCycle += 1;
-        return DEIDARA.fly6;
-      } else if (this.deidaraCycle < 130) {
-        this.deidaraCycle = 0;
-        return DEIDARA.fly1;
-      }
+        if (this.deidaraCycle < 10) {
+            this.deidaraCycle += 1;
+            return DEIDARA.fly1;
+        } else if (this.deidaraCycle < 30) {
+            this.deidaraCycle += 1;
+            return DEIDARA.fly2;
+        } else if (this.deidaraCycle < 50) {
+            this.deidaraCycle += 1;
+            return DEIDARA.fly3;
+        } else if (this.deidaraCycle < 70) {
+            this.deidaraCycle += 1;
+            return DEIDARA.fly4;
+        } else if (this.deidaraCycle < 90) {
+            this.deidaraCycle += 1;
+            return DEIDARA.fly5;
+        } else if (this.deidaraCycle < 110) {
+            this.deidaraCycle += 1;
+            return DEIDARA.fly6;
+        } else if (this.deidaraCycle < 130) {
+            this.deidaraCycle = 0;
+            return DEIDARA.fly1;
+        }
   }
 
   pickOrochi() {
-      if (this.orochiCycle < 20) {
-        this.orochiCycle += 1;
-        return OROCHI.run1;
-      } else if (this.orochiCycle < 50) {
-        this.orochiCycle += 1;
-        return OROCHI.run2;
-      } else if (this.orochiCycle < 80) {
-        this.orochiCycle += 1;
-        return OROCHI.run3;
-      } else if (this.orochiCycle < 110) {
-        this.orochiCycle += 1;
-        return OROCHI.run4;
-      } else if (this.orochiCycle < 140) {
-        this.orochiCycle += 1;
-        return OROCHI.strike1;
-      } else if (this.orochiCycle < 170) {
-        this.orochiCycle += 1;
-        return OROCHI.strike2;
-      } else if (this.orochiCycle < 200) {
-        this.orochiCycle += 1;
-        return OROCHI.strike3;
-      } else if (this.orochiCycle < 230) {
-        this.orochiCycle += 1;
-        return OROCHI.strike1;
-      } else if (this.orochiCycle < 260) {
-        this.orochiCycle = 0;
-        return OROCHI.run1;
-      }
+        if (this.orochiCycle < 20) {
+            this.orochiCycle += 1;
+            return OROCHI.run1;
+        } else if (this.orochiCycle < 50) {
+            this.orochiCycle += 1;
+            return OROCHI.run2;
+        } else if (this.orochiCycle < 80) {
+            this.orochiCycle += 1;
+            return OROCHI.run3;
+        } else if (this.orochiCycle < 110) {
+            this.orochiCycle += 1;
+            return OROCHI.run4;
+        } else if (this.orochiCycle < 140) {
+            this.orochiCycle += 1;
+            return OROCHI.strike1;
+        } else if (this.orochiCycle < 170) {
+            this.orochiCycle += 1;
+            return OROCHI.strike2;
+        } else if (this.orochiCycle < 200) {
+            this.orochiCycle += 1;
+            return OROCHI.strike3;
+        } else if (this.orochiCycle < 230) {
+            this.orochiCycle += 1;
+            return OROCHI.strike1;
+        } else if (this.orochiCycle < 260) {
+            this.orochiCycle = 0;
+            return OROCHI.run1;
+        }
   }
 
   drawNinja(ctx) {
-    this.eachNinja(function (ninja) {
-        if (ninja.oneNinja.type === 0 || ninja.oneNinja.type === 1) {
-            ninja.oneNinja.top = 300;
-            ninja.oneNinja.bottom = 400;
-            const sprite = this.pickKisame();
-            ctx.drawImage(this.kisame, sprite[0], sprite[1], sprite[2], sprite[3], ninja.oneNinja.left, this.y + 30, 80, 80);
-        } else if (ninja.oneNinja.type === 4) {
-            ninja.oneNinja.top = 100;
-            ninja.oneNinja.bottom = 200;
-            const sprite = this.pickDeidara();
-            ctx.drawImage(this.deidara, sprite[0], sprite[1], sprite[2], sprite[3], ninja.oneNinja.left, this.y - 150, 100, 100);
-        } else if (ninja.oneNinja.type === 2 || ninja.oneNinja.type === 3) {
-            ninja.oneNinja.top = 300;
-            ninja.oneNinja.bottom = 400;
-            const sprite = this.pickOrochi();
-            ctx.drawImage(this.orochi, sprite[0], sprite[1], sprite[2], sprite[3], ninja.oneNinja.left, this.y + 35, 80, 80);
-        }
-    });
+        this.eachNinja(function (ninja) {
+            if (ninja.oneNinja.type === 0 || ninja.oneNinja.type === 1) {
+                ninja.oneNinja.top = 300;
+                ninja.oneNinja.bottom = 400;
+                const sprite = this.pickKisame();
+                ctx.drawImage(this.kisame, sprite[0], sprite[1], sprite[2], sprite[3], ninja.oneNinja.left, this.y + 30, 80, 80);
+            } else if (ninja.oneNinja.type === 4) {
+                ninja.oneNinja.top = 100;
+                ninja.oneNinja.bottom = 200;
+                const sprite = this.pickDeidara();
+                ctx.drawImage(this.deidara, sprite[0], sprite[1], sprite[2], sprite[3], ninja.oneNinja.left, this.y - 150, 100, 100);
+            } else if (ninja.oneNinja.type === 2 || ninja.oneNinja.type === 3) {
+                ninja.oneNinja.top = 300;
+                ninja.oneNinja.bottom = 400;
+                const sprite = this.pickOrochi();
+                ctx.drawImage(this.orochi, sprite[0], sprite[1], sprite[2], sprite[3], ninja.oneNinja.left, this.y + 35, 80, 80);
+            }
+        });
 
-    if (this.ninjas[0].oneNinja.left <= 0 || this.ninjaHit) {
-      this.ninjas.shift();
-      const newNinja = this.ninjas[0].oneNinja.left + 1300;
-      this.ninjas.push(this.createNinja(newNinja));
-      this.ninjaHit = false;
-    }
+        if (this.ninjas[0].oneNinja.left <= 0 || this.ninjaHit) {
+        this.ninjas.shift();
+        const newNinja = this.ninjas[0].oneNinja.left + 1300;
+        this.ninjas.push(this.createNinja(newNinja));
+        this.ninjaHit = false;
+        }
   }
 
   randomNinja(max) {
@@ -467,64 +499,64 @@ class Ninja {
     }
 
   move() {
-    this.eachNinja(function (ninja) {
-      ninja.oneNinja.left -= this.speed;
-    });
-    // this.x -= this.speed;
+        this.eachNinja(function (ninja) {
+        ninja.oneNinja.left -= this.speed;
+        });
+        // this.x -= this.speed;
   }
 
   animate(ctx) {
-    this.move();
-    this.drawNinja(ctx);
+        this.move();
+        this.drawNinja(ctx);
   }
 
   checkNinjaCollision(player) {
-    const _collision = (ninjaBox, playerBox) => {
-      if (ninjaBox.left > playerBox.right || ninjaBox.right < playerBox.left) {
-        return false;
-      }
-      if (ninjaBox.top > playerBox.bottom || ninjaBox.bottom < playerBox.top) {
-        return false;
-      }
+        const _collision = (ninjaBox, playerBox) => {
+        if (ninjaBox.left > playerBox.right || ninjaBox.right < playerBox.left) {
+            return false;
+        }
+        if (ninjaBox.top > playerBox.bottom || ninjaBox.bottom < playerBox.top) {
+            return false;
+        }
 
-      return true;
-    };
+        return true;
+        };
 
-    let hit = false;
-    this.eachNinja((ninja) => {
-      if (_collision(ninja.oneNinja, player)) {
-        hit = true;
-      }
-    });
-    return hit;
+        let hit = false;
+        this.eachNinja((ninja) => {
+        if (_collision(ninja.oneNinja, player)) {
+            hit = true;
+        }
+        });
+        return hit;
   }
 
   checkRasenganCollision(rasengan) {
-    const _collision = (ninjaBox, rasenganBox) => {
-      if (
-        ninjaBox.left > rasenganBox.right ||
-        ninjaBox.right < rasenganBox.left
-      ) {
-        return false;
-      }
-      if (
-        ninjaBox.top > rasenganBox.bottom ||
-        ninjaBox.bottom < rasenganBox.top
-      ) {
-        return false;
-      }
+        const _collision = (ninjaBox, rasenganBox) => {
+        if (
+            ninjaBox.left > rasenganBox.right ||
+            ninjaBox.right < rasenganBox.left
+        ) {
+            return false;
+        }
+        if (
+            ninjaBox.top > rasenganBox.bottom ||
+            ninjaBox.bottom < rasenganBox.top
+        ) {
+            return false;
+        }
 
-      return true;
-    };
+        return true;
+        };
 
-    let onTarget = false;
-    this.eachNinja((ninja) => {
-      if (_collision(ninja.oneNinja, rasengan)) {
-        onTarget = true;
-      }
-    });
-    return onTarget;
-  }
+        let onTarget = false;
+        this.eachNinja((ninja) => {
+        if (_collision(ninja.oneNinja, rasengan)) {
+            onTarget = true;
+        }
+        });
+        return onTarget;
+    }
 }
 
 module.exports = Ninja;

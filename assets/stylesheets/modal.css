@@ -1,0 +1,116 @@
+.modal-story {
+  font-size: 15px;
+  font-family: 'Naruto';
+  color: rgb(255, 73, 1);
+  position: absolute;
+  display: flex;
+  top: 25%;
+  left: 30%;
+  /* opacity: 0.7; */
+}
+
+.modal-line{
+    font-size: 15px;
+  font-family: 'Naruto';
+  color: rgb(255, 73, 1);
+  position: absolute;
+  display: flex;
+  top: 30%;
+  left: 36%;
+  /* opacity: 0.7; */
+}
+
+.modal-on {
+    font-family: 'Naruto';
+}
+
+.modal-background{
+    position: absolute;
+    height: 355px;
+    width: 705px;    
+    background-image: url('../images/forest.png');
+    left: 25%;
+    top: 20%;
+    font-family: 'Naruto';
+}
+
+.modal-off {
+  display: none;
+}
+
+.backstory {
+    position: relative;
+    display: flex;
+    left: 15%;
+    top: -20px;
+}
+.instructions {
+    color: white;
+    font-family: 'Baloo Tamma 2', cursive;
+    border-bottom: 1px solid white;
+}
+
+.jump {
+    position: absolute;
+    color: white;
+    font-family: 'Baloo Tamma 2', cursive;
+    padding-top: 10px;
+}
+
+.attack {
+    position: absolute;
+    color: white;
+    font-family: 'Baloo Tamma 2', cursive;
+    top: 50px;
+    left: 15px;
+    padding-top: 10px;
+}
+
+.disclaimer {
+    position: absolute;
+    display: flex;
+    color: white;
+    font-family: 'Baloo Tamma 2', cursive;
+    top: 360px;
+    left: 19%;
+}
+
+.background{
+    background-color: black;
+    width: 100%;
+    height: 100%;
+}
+
+.socials {
+    display: flex;
+    position: relative;
+    top: 30px;
+    justify-content: center;
+    color: white;
+}
+
+.title {
+    font-family: 'Naruto';
+    color: cyan;
+    font-size: 80px;
+    position: relative;
+    top: -10px;
+    left: -10px;
+}
+.social-github {
+    position: relative;
+    left: -30px;
+}
+
+.social-linkedin{
+    position: relative;
+    left: 10px;
+}
+
+.sound {
+    position: relative;
+    color: white;
+    left: 71%;
+    top: 20px;
+    z-index: 100;
+}
