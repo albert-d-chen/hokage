@@ -1,6 +1,6 @@
 # Hokage
 
-[Live](https://albert-d-chen.github.io/Hokage/)
+[Live](https://albert-d-chen.github.io/hokage/)
 
 Hokage is an infinite run game with a Naruto theme. You will make your journey prove everyone who has turned their back on you to become Hokage and save the world.
 
