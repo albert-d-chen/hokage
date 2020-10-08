@@ -71,7 +71,16 @@
     display: flex;
     color: white;
     font-family: 'Baloo Tamma 2', cursive;
-    top: 390px;
+    top: 370px;
+    left: 15%;
+}
+
+.disclaimer2 {
+    position: absolute;
+    display: flex;
+    color: white;
+    font-family: 'Baloo Tamma 2', cursive;
+    top: 400px;
     left: 15%;
 }
 
